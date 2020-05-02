@@ -1,4 +1,4 @@
 .DS_Store
-final.iml
-out
-/idea
+.iml
+/out/*
+/idea/*

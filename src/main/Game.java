@@ -136,20 +136,14 @@ public class Game extends Scene {
             int getRandomPosX = rand.nextInt(this.rows);
             int getRandomPosY = rand.nextInt(this.columns);
 
-            System.out.println(isBlacklistCoordinate(getRandomPosX, getRandomPosY));
-
-            if (isBlacklistCoordinate(getRandomPosX, getRandomPosY)) {
-                while (isBlacklistCoordinate(getRandomPosX, getRandomPosY)) {
-                    getRandomPosX = rand.nextInt(this.rows);
-                    getRandomPosY = rand.nextInt(this.columns);
-                }
-
-                map[getRandomPosX][getRandomPosY].getChildren().add(this.pits.get(i));
-                pos.add(new Coordinate(getRandomPosX, getRandomPosY));
-            } else {
-                map[getRandomPosX][getRandomPosY].getChildren().add(this.pits.get(i));
-                pos.add(new Coordinate(getRandomPosX, getRandomPosY));
+            while ((isBlacklistCoordinate(getRandomPosX, getRandomPosY))
+                    || (getRandomPosX == this.posX) && (getRandomPosY == this.posY) ) {
+                getRandomPosX = rand.nextInt(this.rows);
+                getRandomPosY = rand.nextInt(this.columns);
             }
+
+            map[getRandomPosX][getRandomPosY].getChildren().add(this.pits.get(i));
+            pos.add(new Coordinate(getRandomPosX, getRandomPosY));
         }
 
         for (int i = 0; i < amountOfPits; i ++) {
