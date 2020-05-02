@@ -1,0 +1,19 @@
+@font-face {
+    -fx-font-family: "Apex";
+    src: url("../fonts/Apex.otf") format("otf");
+}
+
+.root * {
+    -fx-font-family: "Apex Mk3";
+}
+
+.button {
+    -fx-background-color: #e67e22;
+    -fx-background-radius: 0;
+    -fx-font-size:40px;
+    -fx-text-fill: white;
+}
+
+.menuBtn-text:hover {
+    -fx-fill: #e67e22;
+}

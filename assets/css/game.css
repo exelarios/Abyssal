@@ -1,0 +1,28 @@
+@font-face {
+    -fx-font-family: "Apex";
+    src: url("../fonts/Apex.otf") format("otf");
+}
+
+.root * {
+    -fx-font-family: "Apex Mk3";
+}
+
+.form-text {
+    -fx-text-fill: white;
+    -fx-font-size: 50px;
+}
+
+.form-input {
+    -fx-background-radius: 0;
+    -fx-font-size: 30px;
+}
+
+.menuBtn-text:hover {
+    -fx-fill: #e67e22;
+}
+
+.form-title {
+    -fx-text-fill: white;
+    -fx-font-size: 50px;
+    -fx-font-weight: bold;
+}
