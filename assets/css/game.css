@@ -26,3 +26,7 @@
     -fx-font-size: 50px;
     -fx-font-weight: bold;
 }
+
+.trap {
+    -fx-fill: #4f4f4f;
+}

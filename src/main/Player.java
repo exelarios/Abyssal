@@ -78,7 +78,7 @@ public class Player extends Rectangle {
             if ( ((gameScene.getPosY() + 1) < gameScene.getColumns()) && !Game.collidedDebounce ) {
                 Game.collidedDebounce = true;
                 gameScene.setPosY(gameScene.getPosY() + 1);
-                gameScene.printPlayerPosition();
+                //gameScene.printPlayerPosition();
                 map[this.posX][this.posY].getChildren().remove(this);
                 gameScene.enterRoom(575,50);
             }
@@ -88,7 +88,7 @@ public class Player extends Rectangle {
             if ( ((gameScene.getPosY() - 1)  >= 0) && !Game.collidedDebounce)  {
                 Game.collidedDebounce = true;
                 gameScene.setPosY(gameScene.getPosY() - 1);
-                gameScene.printPlayerPosition();
+                //gameScene.printPlayerPosition();
                 map[this.posX][this.posY].getChildren().remove(this);
                 gameScene.enterRoom(575,650);
             }
@@ -98,7 +98,7 @@ public class Player extends Rectangle {
             if ( ((gameScene.getPosX() - 1)  >= 0) && !Game.collidedDebounce)  {
                 Game.collidedDebounce = true;
                 gameScene.setPosX(gameScene.getPosX() - 1);
-                gameScene.printPlayerPosition();
+                //gameScene.printPlayerPosition();
                 map[this.posX][this.posY].getChildren().remove(this);
                 gameScene.enterRoom(1100,350);
             }
@@ -108,7 +108,7 @@ public class Player extends Rectangle {
             if ( ((gameScene.getPosX() + 1) < gameScene.getRows()) && !Game.collidedDebounce)  {
                 Game.collidedDebounce = true;
                 gameScene.setPosX(gameScene.getPosX() + 1);
-                gameScene.printPlayerPosition();
+                //gameScene.printPlayerPosition();
                 map[this.posX][this.posY].getChildren().remove(this);
                 gameScene.enterRoom(50,350);
             }

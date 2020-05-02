@@ -1,5 +1,6 @@
 package main;
 
+import com.sun.xml.internal.bind.v2.runtime.Coordinator;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
@@ -11,20 +12,31 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Game extends Scene {
 
     private Pane gamePane = new Pane();
+
     private int width;
     private int height;
-    private String name;
+
     private int rows;
     private int columns;
+
     private int posX;
     private int posY;
-    private Cave[][] map;
+
     private Player player;
+    private String name;
+    private int lives;
+    private Random rand = new Random();
+
+    private Cave[][] map;
+
+    private ArrayList<Coordinate> pos = new ArrayList<>();
+    private ArrayList<Trap> pits = new ArrayList<>();
 
     public static boolean collidedDebounce;
 
@@ -94,20 +106,54 @@ public class Game extends Scene {
     }
 
     private void initializeMap() {
-        Random rand = new Random();
 
         map = new Cave[this.rows][this.columns];
 
         this.posX = rand.nextInt(this.rows);
         this.posY = rand.nextInt(this.columns);
 
-        System.out.println("Player: " + this.posX + ", " + this.posY);
+        System.out.println("Player Location: " + this.posX + ", " + this.posY);
         System.out.println("Map Length: " + map.length + ", " + map[0].length);
 
         for (int i = 0; i < this.rows; i++) {
             for (int j = 0; j < this.columns; j++) {
                 map[i][j] = new Cave(this, this.player, i, j);
             }
+        }
+
+        addPits();
+
+    }
+
+    private void addPits() {
+
+        int amountOfPits =  rand.nextInt((this.rows * this.columns) / 3) + 1;
+        System.out.println("Total of pits: " + amountOfPits);
+
+        for (int i = 0; i < amountOfPits; i++) {
+            this.pits.add(new Trap());
+
+            int getRandomPosX = rand.nextInt(this.rows);
+            int getRandomPosY = rand.nextInt(this.columns);
+
+            System.out.println(isBlacklistCoordinate(getRandomPosX, getRandomPosY));
+
+            if (isBlacklistCoordinate(getRandomPosX, getRandomPosY)) {
+                while (isBlacklistCoordinate(getRandomPosX, getRandomPosY)) {
+                    getRandomPosX = rand.nextInt(this.rows);
+                    getRandomPosY = rand.nextInt(this.columns);
+                }
+
+                map[getRandomPosX][getRandomPosY].getChildren().add(this.pits.get(i));
+                pos.add(new Coordinate(getRandomPosX, getRandomPosY));
+            } else {
+                map[getRandomPosX][getRandomPosY].getChildren().add(this.pits.get(i));
+                pos.add(new Coordinate(getRandomPosX, getRandomPosY));
+            }
+        }
+
+        for (int i = 0; i < amountOfPits; i ++) {
+            System.out.println(pos.get(i));
         }
     }
 
@@ -118,11 +164,23 @@ public class Game extends Scene {
         map[this.posX][this.posY].getChildren().add(player);
     }
 
-
     public void enterRoom(int spawnX, int spawnY) {
         this.setRoot(map[this.posX][this.posY]);
         generatePlayer(spawnX, spawnY);
         Game.collidedDebounce = false;
+    }
+
+    public boolean isBlacklistCoordinate(int posX, int posY) {
+        for (int i = 0; i < pos.size(); i++) {
+            if ( (pos.get(i).getPosX() == posX) && (pos.get(i).getPosY() == posY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void checkTrapCollision() {
+
     }
 
 }
