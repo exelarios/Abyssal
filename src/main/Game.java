@@ -39,6 +39,7 @@ public class Game extends Scene {
     private ArrayList<Trap> pits = new ArrayList<>();
 
     public static boolean collidedDebounce;
+    public static boolean touchedTrap;
 
     public Game(Stage currentStage, int width, int height) {
         super(new Pane(), width, height);
@@ -71,6 +72,18 @@ public class Game extends Scene {
         return this.columns;
     }
 
+    public int getLives() {
+        return this.lives;
+    }
+
+    public void setLives(int lives) {
+        if (lives <= 0) {
+            gameOver();
+        } else {
+            this.lives = lives;
+        }
+    }
+
     public String getName() {
         return this.name;
     }
@@ -87,22 +100,42 @@ public class Game extends Scene {
         System.out.println( this.getPosX() + ", " + this.getPosY());
     }
 
+    public ArrayList<Trap> getPits() {
+        return this.pits;
+    }
+
     private void getGameInfo() {
 
-        GameForm gameInfo = new GameForm(260, 200);
+        GameForm gameInfo = new GameForm( 260, 200);
 
         gamePane.getChildren().add(gameInfo);
 
         gameInfo.getButton().setOnMouseClicked(event -> {
-            this.name = gameInfo.getName();
-            this.rows = Integer.parseInt(gameInfo.getRows());
-            this.columns = Integer.parseInt(gameInfo.getColumn());
-
-            gamePane.requestFocus(); // remove text input focus.
-
-            initializeMap();
-            enterRoom(575, 350);
+            initializeGame(gameInfo);
         });
+
+        this.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                if ((gameInfo.getName() != null) && (gameInfo.getRows() != null) && (gameInfo.getColumn() != null)) {
+                    initializeGame(gameInfo);
+                }
+            }
+        });
+    }
+
+    public void gameOver() {
+        setRoot(new GameOver(this));
+    }
+
+    private void initializeGame(GameForm gameInfo) {
+        this.name = gameInfo.getName();
+        this.rows = Integer.parseInt(gameInfo.getRows());
+        this.columns = Integer.parseInt(gameInfo.getColumn());
+
+        gamePane.requestFocus(); // remove text input focus.
+
+        initializeMap();
+        enterRoom(575, 350);
     }
 
     private void initializeMap() {
@@ -125,6 +158,11 @@ public class Game extends Scene {
 
     }
 
+
+    /*
+    TODO: Add Moving square.
+     */
+
     private void addPits() {
 
         int amountOfPits =  rand.nextInt((this.rows * this.columns) / 3) + 1;
@@ -136,6 +174,7 @@ public class Game extends Scene {
             int getRandomPosX = rand.nextInt(this.rows);
             int getRandomPosY = rand.nextInt(this.columns);
 
+            // Make sure the traps are not spawned at the same place or the player's spawn.
             while ((isBlacklistCoordinate(getRandomPosX, getRandomPosY))
                     || (getRandomPosX == this.posX) && (getRandomPosY == this.posY) ) {
                 getRandomPosX = rand.nextInt(this.rows);
@@ -172,9 +211,4 @@ public class Game extends Scene {
         }
         return false;
     }
-
-    public void checkTrapCollision() {
-
-    }
-
 }

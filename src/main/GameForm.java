@@ -1,6 +1,7 @@
 package main;
 
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 
 public class GameForm extends GridPane {
@@ -38,6 +39,8 @@ public class GameForm extends GridPane {
         colInput.setTranslateX(-330);
         submit.setTranslateX(440);
         submit.setTranslateY(230);
+
+
     }
 
     public String getName() {

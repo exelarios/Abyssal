@@ -9,7 +9,6 @@ public class Trap extends Rectangle {
     public Trap() {
 
         Random rand = new Random();
-
         this.setHeight(100);
         this.setWidth(100);
         this.getStyleClass().add("trap");

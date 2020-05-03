@@ -38,6 +38,7 @@ public class Player extends Rectangle {
     public void movements() {
         gameScene.setOnKeyPressed(event -> {
             checkDoorCollision();
+            checkTrapCollision();
             switch(event.getCode()) {
                 case W:
                     if (this.getY() > 0) {
@@ -111,6 +112,19 @@ public class Player extends Rectangle {
                 //gameScene.printPlayerPosition();
                 map[this.posX][this.posY].getChildren().remove(this);
                 gameScene.enterRoom(50,350);
+            }
+        }
+    }
+
+    private void checkTrapCollision() {
+        for (int pit = 0; pit < gameScene.getPits().size(); pit++) {
+            if (map[this.posX][this.posY].getChildren().contains(gameScene.getPits().get(pit))) {
+                map[this.posX][this.posY].setMessage("You look around and you notice that the ground looks a bit odd.");
+                if (isCollided(gameScene.getPits().get(pit).getBoundsInParent()) && !Game.collidedDebounce) {
+                    Game.collidedDebounce = true;
+                    Game.touchedTrap = true;
+                    gameScene.setLives(0);
+                }
             }
         }
     }

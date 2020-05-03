@@ -28,5 +28,15 @@
 }
 
 .trap {
-    -fx-fill: #4f4f4f;
+    -fx-fill: rgba(37, 37, 37, 0.37);
+}
+
+.gameOver-text {
+    -fx-text-fill: white;
+    -fx-font-size: 100px;
+}
+
+.message-text {
+    -fx-text-fill: white;
+    -fx-font-size: 50px;
 }

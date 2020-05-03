@@ -17,6 +17,7 @@ public class Cave extends Pane {
     private int posX;
     private int posY;
     private Game gameScene;
+    private Message msg;
 
     public Cave(Game gameScene, Player player, int posX, int posY) {
         this.gameScene = gameScene;
@@ -26,12 +27,19 @@ public class Cave extends Pane {
         Label positionLabel = new Label("(" + this.posX + ", " + this.posY + ")" );
         positionLabel.setStyle("-fx-font-size: 20px");
         positionLabel.setTextFill(Color.color(Math.random(), Math.random(), Math.random()));
-        this.getChildren().add(positionLabel);
+
+        msg = new Message(this);
+
+        this.getChildren().addAll(positionLabel, msg);
 
         this.setStyle("-fx-background-color: #212121");
 
         addDoors();
         removeDoors();
+    }
+
+    public void setMessage(String text) {
+        msg.setText(text);
     }
 
     public void addDoors() {
