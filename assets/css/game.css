@@ -40,3 +40,11 @@
     -fx-text-fill: white;
     -fx-font-size: 50px;
 }
+
+.caves {
+    -fx-background-color: #212121;
+    /*
+    -fx-background-image: url(../../assets/images/background.png);
+    -fx-background-size: 100%;
+     */
+}

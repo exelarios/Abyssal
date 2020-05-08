@@ -17,3 +17,13 @@
 .menuBtn-text:hover {
     -fx-fill: #e67e22;
 }
+
+.form-text {
+    -fx-text-fill: white;
+    -fx-font-size: 50px;
+}
+
+.form-input {
+    -fx-background-radius: 0;
+    -fx-font-size: 30px;
+}

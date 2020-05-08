@@ -1,11 +1,18 @@
 package main;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
 
 public class Cave extends Pane {
 
@@ -18,11 +25,20 @@ public class Cave extends Pane {
     private int posY;
     private Game gameScene;
     private Message msg;
+    private GridPane livesPane;
+    private boolean isCurseActive;
+    private boolean isPowerUpActive;
+    private boolean touchedTrap;
+    private Label ammoLabel;
 
     public Cave(Game gameScene, Player player, int posX, int posY) {
         this.gameScene = gameScene;
         this.posX = posX;
         this.posY = posY;
+
+        this.isCurseActive = false;
+        this.isPowerUpActive = false;
+        this.touchedTrap = false;
 
         Label positionLabel = new Label("(" + this.posX + ", " + this.posY + ")" );
         positionLabel.setStyle("-fx-font-size: 20px");
@@ -30,16 +46,66 @@ public class Cave extends Pane {
 
         msg = new Message(this);
 
-        this.getChildren().addAll(positionLabel, msg);
+        this.getChildren().addAll(msg);
 
-        this.setStyle("-fx-background-color: #212121");
-
+        this.getStyleClass().add("caves");
+        displayAmmo();
+        displayLives();
         addDoors();
         removeDoors();
+
     }
+
+    public GridPane getLivesPane() {
+        return this.livesPane;
+    }
+
+    public boolean getIsPowerUpActive() {
+        return this.isPowerUpActive;
+    }
+
+    public void setIsPowerIsActive(boolean bool) {
+        this.isPowerUpActive = bool;
+    }
+
+    public boolean getTouchedTrap() {
+        return this.touchedTrap;
+    }
+
+    public void setTouchedTrap(boolean bool) {
+        this.touchedTrap = bool;
+    }
+
+    public Label getDisplayAmmo() {
+        return ammoLabel;
+    }
+
+    public void displayAmmo() {
+
+        ammoLabel = new Label("Ammo: " + gameScene.getAmmo());
+        ammoLabel.setPadding(new Insets(10,10,10,10));
+        ammoLabel.setStyle("-fx-text-fill: white; -fx-font-size: 30px");
+        ammoLabel.setTextAlignment(TextAlignment.RIGHT);
+        ammoLabel.setTranslateX(gameScene.getWidth() - 120);
+
+        this.getChildren().add(ammoLabel);
+    }
+
 
     public void setMessage(String text) {
         msg.setText(text);
+    }
+
+    public void displayLives(){
+        livesPane = new GridPane();
+        livesPane.setPadding(new Insets(10,10,10,10));
+        livesPane.setHgap(10);
+        livesPane.setVgap(10);
+       for (int i = 0; i < gameScene.getLives(); i++) {
+           ImageView lives = new ImageView(new Image("file:././assets/images/heart.png"));
+           livesPane.add(lives, i, 0);
+       }
+       this.getChildren().add(livesPane);
     }
 
     public void addDoors() {
@@ -49,6 +115,17 @@ public class Cave extends Pane {
         leftDoor = new Rectangle(0, 275, 30, 200);
 
         this.getChildren().addAll(topDoor, bottomDoor, rightDoor, leftDoor);
+    }
+
+    public void activateCurse() {
+        if (!isCurseActive) {
+            for (int i = 0; i < gameScene.getTalkers().size(); i++) {
+                if (this.getChildren().contains(gameScene.getTalkers().get(i))) {
+                    gameScene.getTalkers().get(i).curseChooser();
+                    isCurseActive = true;
+                }
+            }
+        }
     }
 
     public void removeDoors() {

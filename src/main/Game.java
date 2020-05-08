@@ -1,19 +1,28 @@
 package main;
 
-import com.sun.xml.internal.bind.v2.runtime.Coordinator;
-import javafx.scene.Group;
+import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
-import javafx.scene.SubScene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+/*
+    TODO: Final implementation.
+        - show map.
+
+    TODO: Save and Load Feature
+        - Saves
+            - rows, Columns
+            - posX, posY
+            - player's Name
+            - speed
+            - ammo
+            - lives
+            - boss lives
+ */
 
 public class Game extends Scene {
 
@@ -31,15 +40,28 @@ public class Game extends Scene {
     private Player player;
     private String name;
     private int lives;
+    private int ammo;
+    private int speed;
+    private int amountOfPowerUps;
+
     private Random rand = new Random();
 
     private Cave[][] map;
 
     private ArrayList<Coordinate> pos = new ArrayList<>();
     private ArrayList<Trap> pits = new ArrayList<>();
+    private ArrayList<Talker> talkers = new ArrayList<>();
+    private ArrayList<PowerUp> powerUps = new ArrayList<>();
+
+    private Boss solomon;
+    private int bossLives = 3;
 
     public static boolean collidedDebounce;
     public static boolean touchedTrap;
+    public static boolean walkerActive;
+    public static boolean playerWon;
+
+    public static String direction;
 
     public Game(Stage currentStage, int width, int height) {
         super(new Pane(), width, height);
@@ -50,10 +72,35 @@ public class Game extends Scene {
         this.width = width;
         this.height = height;
 
+        this.lives = 3;
+        this.ammo = 0;
+        this.speed = 10;
+
         currentStage.setScene(this);
         this.getStylesheets().add("file:././assets/css/game.css");
 
         getGameInfo();
+    }
+
+    public Game(Stage currentStage, int width, int height, String name, int rows, int columns, int lives, int ammo, int speed, int bossLives) {
+        super(new Pane(), width, height);
+        this.setRoot(gamePane);
+        gamePane.setStyle("-fx-background-color: black");
+        currentStage.setScene(this);
+        this.getStylesheets().add("file:././assets/css/game.css");
+
+        this.width = width;
+        this.height = height;
+
+        this.name = name;
+        this.rows = rows;
+        this.columns = columns;
+        this.lives = lives;
+        this.ammo = ammo;
+        this.speed = speed;
+        this.bossLives = bossLives;
+
+        initializeGame();
     }
 
     public int getPosX() {
@@ -76,12 +123,56 @@ public class Game extends Scene {
         return this.lives;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setAmmo(int value) {
+        this.ammo = value;
+        getCurrentCave().getChildren().remove(getCurrentCave().getDisplayAmmo());
+        getCurrentCave().displayAmmo();
+    }
+
+    public int getAmmo() {
+        return this.ammo;
+    }
+
+    public int getBossLives() {
+        return this.bossLives;
+    }
+
+    public void setBossLives(int lives) {
+        this.bossLives = lives;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public int getSpeed() {
+        return this.speed;
+    }
+
     public void setLives(int lives) {
-        if (lives <= 0) {
+        if (lives < 1) {
             gameOver();
         } else {
             this.lives = lives;
+            updateLivesUI();
         }
+    }
+
+    public void updateLivesUI() {
+        this.getCurrentCave().getChildren().remove(this.getCurrentCave().getLivesPane());
+        this.getCurrentCave().displayLives();
+    }
+
+    public Cave getCurrentCave() {
+        return this.map[this.posX][this.posY];
+    }
+
+    public Cave[][] getCave() {
+        return this.map;
     }
 
     public String getName() {
@@ -104,6 +195,22 @@ public class Game extends Scene {
         return this.pits;
     }
 
+    public ArrayList<Talker> getTalkers() {
+        return this.talkers;
+    }
+
+    public ArrayList<PowerUp> getPowerUps() {
+        return this.powerUps;
+    }
+
+    public Boss getBoss() {
+        return this.solomon;
+    }
+
+    public void setBoss(Boss solomon) {
+        this.solomon = solomon;
+    }
+
     private void getGameInfo() {
 
         GameForm gameInfo = new GameForm( 260, 200);
@@ -124,7 +231,7 @@ public class Game extends Scene {
     }
 
     public void gameOver() {
-        setRoot(new GameOver(this));
+        setRoot(new GameOver(this, "Game Over"));
     }
 
     private void initializeGame(GameForm gameInfo) {
@@ -134,8 +241,19 @@ public class Game extends Scene {
 
         gamePane.requestFocus(); // remove text input focus.
 
-        initializeMap();
-        enterRoom(575, 350);
+        if ((this.rows >= 4) && (this.columns >= 4)) {
+            initializeMap();
+            enterRoom(575, 350);
+            addTalkers();
+        }
+    }
+
+    private void initializeGame() {
+        if ((this.rows >= 4) && (this.columns >= 4)) {
+            initializeMap();
+            enterRoom(575, 350);
+            addTalkers();
+        }
     }
 
     private void initializeMap() {
@@ -155,18 +273,15 @@ public class Game extends Scene {
         }
 
         addPits();
+        addPowerUps();
+        addSolomon();
 
     }
-
-
-    /*
-    TODO: Add Moving square.
-     */
 
     private void addPits() {
 
         int amountOfPits =  rand.nextInt((this.rows * this.columns) / 3) + 1;
-        System.out.println("Total of pits: " + amountOfPits);
+        System.out.println("Total pits: " + amountOfPits);
 
         for (int i = 0; i < amountOfPits; i++) {
             this.pits.add(new Trap());
@@ -184,23 +299,26 @@ public class Game extends Scene {
             map[getRandomPosX][getRandomPosY].getChildren().add(this.pits.get(i));
             pos.add(new Coordinate(getRandomPosX, getRandomPosY));
         }
-
-        for (int i = 0; i < amountOfPits; i ++) {
-            System.out.println(pos.get(i));
-        }
     }
 
-    private void generatePlayer(int spawnX, int spawnY) {
-        player = new Player(this, 10, "#e67e22", 50, this.width, this.height,
-                this.map, this.posX, this.posY, spawnX, spawnY);
+    private void addTalkers() {
+        int amountofTalkers = rand.nextInt((this.rows * this.columns) / 3) + 1;
+        System.out.println("Total Talkers: " + amountofTalkers);
+       for (int i = 0; i < amountofTalkers; i++) {
+           this.talkers.add(new Talker(this));
 
-        map[this.posX][this.posY].getChildren().add(player);
-    }
+           int getRandomPosX = rand.nextInt(this.rows);
+           int getRandomPosY = rand.nextInt(this.columns);
 
-    public void enterRoom(int spawnX, int spawnY) {
-        this.setRoot(map[this.posX][this.posY]);
-        generatePlayer(spawnX, spawnY);
-        Game.collidedDebounce = false;
+           while ((isBlacklistCoordinate(getRandomPosX, getRandomPosY))
+                   || (getRandomPosX == this.posX) && (getRandomPosY == this.posY) ) {
+               getRandomPosX = rand.nextInt(this.rows);
+               getRandomPosY = rand.nextInt(this.columns);
+           }
+
+           map[getRandomPosX][getRandomPosY].getChildren().add(this.talkers.get(i));
+           pos.add(new Coordinate(getRandomPosX, getRandomPosY));
+       }
     }
 
     public boolean isBlacklistCoordinate(int posX, int posY) {
@@ -211,4 +329,75 @@ public class Game extends Scene {
         }
         return false;
     }
+
+    private void addPowerUps() {
+        amountOfPowerUps = rand.nextInt( ((this.rows * this.columns) / 4) ) + 1;
+        System.out.println("Total PowerUs: " + amountOfPowerUps);
+
+        for(int i = 0; i < amountOfPowerUps; i++) {
+            this.powerUps.add(new PowerUp(this));
+
+            int getRandomPosX = rand.nextInt(this.rows);
+            int getRandomPosY = rand.nextInt(this.columns);
+
+            map[getRandomPosX][getRandomPosY].getChildren().add(this.powerUps.get(i));
+            pos.add(new Coordinate(getRandomPosX, getRandomPosY));
+        }
+
+    }
+
+    private void addSolomon() {
+        int getRandomPosX = rand.nextInt(this.rows);
+        int getRandomPosY = rand.nextInt(this.columns);
+
+        while ((isBlacklistCoordinate(getRandomPosX, getRandomPosY))
+                || (getRandomPosX == this.posX) && (getRandomPosY == this.posY) ) {
+            getRandomPosX = rand.nextInt(this.rows);
+            getRandomPosY = rand.nextInt(this.columns);
+        }
+
+        generateBoss(getRandomPosX, getRandomPosY);
+        this.pos.add(new Coordinate(getRandomPosX, getRandomPosY));
+    }
+
+    public void generateBoss(int posX, int posY) {
+        System.out.println("Boss Location: " + posX + ", " + posY);
+        solomon = new Boss(this, posX, posY);
+        this.map[posX][posY].getChildren().add(solomon);
+    }
+
+    public void generateMorePowerUps() {
+        if (PowerUp.powerUpCounter >= amountOfPowerUps) {
+            PowerUp.powerUpCounter = 0;
+            addPowerUps();
+        }
+    }
+
+    private void generatePlayer(int spawnX, int spawnY) {
+        player = new Player(this, this.speed, "#e67e22", 50, this.width, this.height,
+                this.map, this.posX, this.posY, spawnX, spawnY);
+
+        map[this.posX][this.posY].getChildren().add(player);
+        map[this.posX][this.posY].activateCurse();
+    }
+
+    public void enterRoom(int spawnX, int spawnY) {
+        this.setRoot(map[this.posX][this.posY]);
+        generatePlayer(spawnX, spawnY);
+        this.updateLivesUI();
+        this.setAmmo(this.getAmmo());
+        Game.collidedDebounce = false;
+        Game.touchedTrap = false;
+
+    }
+
+    private void generatehelperMap() {
+
+    }
+
+    public void finishGame() {
+        setRoot(new GameOver(this, "You woke up from a dream."));
+    }
+
+
 }
