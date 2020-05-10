@@ -1,11 +1,9 @@
-package main;
+package entity;
 
 import javafx.geometry.Point2D;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import view.Game;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Walker extends Rectangle {

@@ -1,24 +1,17 @@
-package main;
+package view;
 
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.layout.Pane;
+import components.MenuButton;
 
 
-import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -51,7 +44,6 @@ public class Menu extends BorderPane {
         setLogo(centerPane);
         playButton(currentStage);
         loadButton(currentStage);
-        saveButton(currentStage);
     }
 
     public void setLogo(Pane pane) {
@@ -68,18 +60,10 @@ public class Menu extends BorderPane {
     }
 
     public void loadButton(Stage currentStage) {
-        MenuButton button = new MenuButton("Load", -50, 360);
+        MenuButton button = new MenuButton("Load Game", -50, 360);
         centerPane.getChildren().add(button);
         button.setOnMouseClicked(event -> {
             fetchUserDataInput();
-        });
-    }
-
-    public void saveButton(Stage currentStage) {
-        MenuButton button = new MenuButton("Save", -50, 420);
-        centerPane.getChildren().add(button);
-        button.setOnMouseClicked(event -> {
-            System.out.println("save");
         });
     }
 

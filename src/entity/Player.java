@@ -1,9 +1,10 @@
-package main;
+package entity;
 
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Bounds;
-import javafx.scene.Scene;
 import javafx.scene.shape.Rectangle;
+import view.Cave;
+import view.Game;
 
 public class Player extends Rectangle {
 

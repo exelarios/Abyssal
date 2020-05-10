@@ -1,7 +1,8 @@
-package main;
+package components;
 
+import components.MenuButton;
+import components.TextInput;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 
 public class GameForm extends GridPane {

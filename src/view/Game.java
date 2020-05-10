@@ -1,11 +1,16 @@
-package main;
+package view;
 
-import javafx.animation.AnimationTimer;
+import components.Coordinate;
+import components.GameForm;
+import entity.*;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,20 +18,12 @@ import java.util.Random;
     TODO: Final implementation.
         - show map.
 
-    TODO: Save and Load Feature
-        - Saves
-            - rows, Columns
-            - posX, posY
-            - player's Name
-            - speed
-            - ammo
-            - lives
-            - boss lives
  */
 
 public class Game extends Scene {
 
     private Pane gamePane = new Pane();
+    private Stage currentStage;
 
     private int width;
     private int height;
@@ -60,6 +57,7 @@ public class Game extends Scene {
     public static boolean touchedTrap;
     public static boolean walkerActive;
     public static boolean playerWon;
+    public static boolean playerDied;
 
     public static String direction;
 
@@ -76,6 +74,7 @@ public class Game extends Scene {
         this.ammo = 0;
         this.speed = 10;
 
+        this.currentStage = currentStage;
         currentStage.setScene(this);
         this.getStylesheets().add("file:././assets/css/game.css");
 
@@ -86,6 +85,7 @@ public class Game extends Scene {
         super(new Pane(), width, height);
         this.setRoot(gamePane);
         gamePane.setStyle("-fx-background-color: black");
+        this.currentStage = currentStage;
         currentStage.setScene(this);
         this.getStylesheets().add("file:././assets/css/game.css");
 
@@ -155,6 +155,7 @@ public class Game extends Scene {
 
     public void setLives(int lives) {
         if (lives < 1) {
+            Game.playerDied = true;
             gameOver();
         } else {
             this.lives = lives;
@@ -231,7 +232,7 @@ public class Game extends Scene {
     }
 
     public void gameOver() {
-        setRoot(new GameOver(this, "Game Over"));
+        setRoot(new GameOver(this, "Game Over", 100));
     }
 
     private void initializeGame(GameForm gameInfo) {
@@ -331,7 +332,7 @@ public class Game extends Scene {
     }
 
     private void addPowerUps() {
-        amountOfPowerUps = rand.nextInt( ((this.rows * this.columns) / 4) ) + 1;
+        amountOfPowerUps = rand.nextInt( ((this.rows * this.columns) / 3) ) + 1;
         System.out.println("Total PowerUs: " + amountOfPowerUps);
 
         for(int i = 0; i < amountOfPowerUps; i++) {
@@ -391,12 +392,47 @@ public class Game extends Scene {
 
     }
 
+    public void saveGame() {
+        File outFile = new File("data/" + this.getName() + ".csv");
+
+        try {
+            PrintWriter pw = new PrintWriter(outFile);
+
+            pw.println(this.getName() + "," +
+                    this.getRows() + "," +
+                    this.getColumns() + "," +
+                    this.getLives() + "," +
+                    this.getAmmo()+ "," +
+                    this.getSpeed() + "," +
+                    this.getBossLives());
+
+            pw.flush();
+            pw.close();
+
+           setRoot(new GameOver(this, "Your progress has been saved.", 50));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteData() {
+        File outFile = new File("data/" + this.getName() + ".csv");
+
+        if (outFile.delete())
+            System.out.println("File deleted successfully");
+    }
+
+    public void restartGame() {
+        currentStage.close();
+        Menu menu = new Menu(currentStage, width, height);
+    }
+
     private void generatehelperMap() {
 
     }
 
     public void finishGame() {
-        setRoot(new GameOver(this, "You woke up from a dream."));
+        setRoot(new GameOver(this, "You woke up from a dream.", 90));
     }
 
 

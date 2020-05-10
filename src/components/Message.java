@@ -1,4 +1,4 @@
-package main;
+package components;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -14,6 +14,14 @@ public class Message extends Label {
 
         textCenter();
         this.setTranslateY(650);
+        this.setStyle("-fx-text-fill: white; -fx-font-size: 15px;");
+    }
+
+    public Message(Pane pane, int posY) {
+        this.pane = pane;
+
+        textCenter();
+        this.setTranslateY(posY);
         this.setStyle("-fx-text-fill: white; -fx-font-size: 15px;");
     }
 

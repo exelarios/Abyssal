@@ -1,4 +1,4 @@
-package main;
+package components;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;

@@ -1,9 +1,8 @@
-package main;
+package entity;
 
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.scene.shape.Rectangle;
+import view.Game;
 
 import java.util.Random;
 

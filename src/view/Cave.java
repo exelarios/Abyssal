@@ -1,18 +1,16 @@
-package main;
+package view;
 
+import entity.Player;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
+import components.Message;
 
 public class Cave extends Pane {
 
@@ -51,6 +49,7 @@ public class Cave extends Pane {
         this.getStyleClass().add("caves");
         displayAmmo();
         displayLives();
+        displaySaveButton();
         addDoors();
         removeDoors();
 
@@ -94,6 +93,17 @@ public class Cave extends Pane {
 
     public void setMessage(String text) {
         msg.setText(text);
+    }
+
+    public void displaySaveButton() {
+        ImageView saveBtn = new ImageView(new Image("file:././assets/images/save.png"));
+        saveBtn.setTranslateY(gameScene.getHeight() - 50);
+        saveBtn.setTranslateX(10);
+        this.getChildren().add(saveBtn);
+
+        saveBtn.setOnMouseClicked(event -> {
+            gameScene.saveGame();
+        });
     }
 
     public void displayLives(){

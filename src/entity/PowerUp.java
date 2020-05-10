@@ -1,6 +1,7 @@
-package main;
+package entity;
 
 import javafx.scene.shape.Rectangle;
+import view.Game;
 
 import java.util.Random;
 
